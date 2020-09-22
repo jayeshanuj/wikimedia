@@ -1,24 +1,24 @@
-{{- if and (include "mediawiki.host" .) (or .Values.mariadb.enabled .Values.externalDatabase.host) -}}
-apiVersion: {{ template "mediawiki.deployment.apiVersion" . }}
+{{- if and (include "Media-wiki.host" .) (or .Values.mariadb.enabled .Values.externalDatabase.host) -}}
+apiVersion: {{ template "Media-wiki.deployment.apiVersion" . }}
 kind: Deployment
 metadata:
-  name: {{ template "mediawiki.fullname" . }}
+  name: {{ template "Media-wiki.fullname" . }}
   labels:
-    app: {{ template "mediawiki.name" . }}
-    chart: {{ template "mediawiki.chart" . }}
+    app: {{ template "Media-wiki.name" . }}
+    chart: {{ template "Media-wiki.chart" . }}
     release: {{ .Release.Name | quote }}
     heritage: {{ .Release.Service | quote }}
 spec:
   selector:
     matchLabels:
-      app: {{ template "mediawiki.name" . }}
+      app: {{ template "Media-wiki.name" . }}
       release: "{{ .Release.Name }}"
   replicas: 1
   template:
     metadata:
       labels:
-        app: {{ template "mediawiki.name" . }}
-        chart: {{ template "mediawiki.chart" . }}
+        app: {{ template "Media-wiki.name" . }}
+        chart: {{ template "Media-wiki.chart" . }}
         release: {{ .Release.Name | quote }}
 {{- if or .Values.podAnnotations .Values.metrics.enabled }}
       annotations:
@@ -30,7 +30,7 @@ spec:
   {{- end }}
 {{- end }}
     spec:
-{{- include "mediawiki.imagePullSecrets" . | indent 6 }}
+{{- include "Media-wiki.imagePullSecrets" . | indent 6 }}
       {{- if .Values.podSecurityContext.enabled }}
       securityContext:
         fsGroup: {{ .Values.podSecurityContext.fsGroup }}
@@ -40,8 +40,8 @@ spec:
           hostnames:
             - "status.localhost"
       containers:
-        - name: {{ template "mediawiki.fullname" . }}
-          image: {{ template "mediawiki.image" . }}
+        - name: {{ template "Media-wiki.fullname" . }}
+          image: {{ template "Media-wiki.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
           {{- if .Values.containerSecurityContext.enabled }}
           securityContext:
@@ -52,7 +52,7 @@ spec:
               value: {{ .Values.allowEmptyPassword | quote }}
             - name: MARIADB_HOST
             {{- if .Values.mariadb.enabled }}
-              value: {{ template "mediawiki.mariadb.fullname" . }}
+              value: {{ template "Media-wiki.mariadb.fullname" . }}
             {{- else }}
               value: {{ .Values.externalDatabase.host | quote }}
             {{- end }}
@@ -78,7 +78,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                 {{- if .Values.mariadb.enabled }}
-                  name: {{ template "mediawiki.mariadb.fullname" . }}
+                  name: {{ template "Media-wiki.mariadb.fullname" . }}
                   key: mariadb-password
                 {{- else }}
                   name: {{ printf "%s-%s" .Release.Name "externaldb" }}
@@ -86,18 +86,18 @@ spec:
                 {{- end }}
             {{- $port:=.Values.service.port | toString }}
             - name: MEDIAWIKI_HOST
-              value: "{{ include "mediawiki.host" . }}{{- if ne $port "80" }}:{{ .Values.service.port }}{{ end }}"
+              value: "{{ include "Media-wiki.host" . }}{{- if ne $port "80" }}:{{ .Values.service.port }}{{ end }}"
             - name: MEDIAWIKI_USERNAME
-              value: {{ .Values.mediawikiUser | quote }}
+              value: {{ .Values.Media-wikiUser | quote }}
             - name: MEDIAWIKI_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "mediawiki.fullname" . }}
-                  key: mediawiki-password
+                  name: {{ template "Media-wiki.fullname" . }}
+                  key: Media-wiki-password
             - name: MEDIAWIKI_EMAIL
-              value: {{ .Values.mediawikiEmail | quote }}
+              value: {{ .Values.Media-wikiEmail | quote }}
             - name: MEDIAWIKI_WIKI_NAME
-              value: {{ .Values.mediawikiName | quote }}
+              value: {{ .Values.Media-wikiName | quote }}
             {{- if .Values.smtpHostID }}
             - name: SMTP_HOST_ID
               value: {{ .Values.smtpHostID | quote }}
@@ -118,7 +118,7 @@ spec:
             - name: SMTP_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "mediawiki.fullname" . }}
+                  name: {{ template "Media-wiki.fullname" . }}
                   key: smtp-password
             {{- end }}
           ports:
@@ -135,7 +135,7 @@ spec:
               port: http
               httpHeaders:
                 - name: Host
-                  value: {{ include "mediawiki.host" . | quote }}
+                  value: {{ include "Media-wiki.host" . | quote }}
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
@@ -149,7 +149,7 @@ spec:
               port: http
               httpHeaders:
                 - name: Host
-                  value: {{ include "mediawiki.host" . | quote }}
+                  value: {{ include "Media-wiki.host" . | quote }}
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
@@ -158,12 +158,12 @@ spec:
           {{- end }}
           resources: {{ toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - mountPath: /bitnami/mediawiki
-              name: mediawiki-data
-              subPath: mediawiki
+            - mountPath: /bitnami/Media-wiki
+              name: Media-wiki-data
+              subPath: Media-wiki
         {{- if .Values.metrics.enabled }}
         - name: metrics
-          image: {{ template "mediawiki.metrics.image" . }}
+          image: {{ template "Media-wiki.metrics.image" . }}
           imagePullPolicy: {{ .Values.metrics.image.pullPolicy | quote }}
           command: [ '/bin/apache_exporter', '--scrape_uri', 'http://status.localhost:80/server-status/?auto']
           ports:
@@ -184,10 +184,10 @@ spec:
           resources: {{ toYaml .Values.metrics.resources | nindent 12 }}
           {{- end }}
       volumes:
-        - name: mediawiki-data
+        - name: Media-wiki-data
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ template "mediawiki.fullname" . }}-mediawiki{{- end }}
+            claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ template "Media-wiki.fullname" . }}-Media-wiki{{- end }}
           {{- else }}
           emptyDir: {}
           {{- end }}
