@@ -1,0 +1,126 @@
+image:
+  registry: docker.io
+  repository: bitnami/mediawiki
+  tag: 1.34.2-debian-10-r45
+
+## User of the application
+mediawikiUser: user
+## Application password
+mediawikiPassword: password
+## Admin email
+mediawikiEmail: user@example.com
+## Name for the wiki
+mediawikiName: Jayesh Wiki
+
+allowEmptyPassword: "yes"
+
+## External database configuration
+externalDatabase:
+  ## Database host
+  host:
+
+  ## Database port
+  port: 3306
+
+  ## Database user
+  user: bn_mediawiki
+
+  ## Database password
+  password:
+
+  ## Database name
+  database: bitnami_mediawiki
+
+mariadb:
+  ## Whether to deploy a mariadb server to satisfy the applications database requirements. To use an external database set this to false and configure the externalDatabase parameters
+  enabled: true
+  ## Disable MariaDB replication
+  replication:
+    enabled: false
+
+  ## Create a database and a database user
+  db:
+    name: bitnami_mediawiki
+    user: bn_mediawiki
+    ## If the password is not specified, mariadb will generates a random password
+    ##
+    # password:
+
+  ## MariaDB admin password
+  # rootUser:
+  #   password:
+
+  ## Enable persistence using Persistent Volume Claims
+  master:
+    persistence:
+      enabled: true
+      accessMode: ReadWriteOnce
+      size: 8Gi
+
+## Kubernetes svc configuration
+service:
+  type: LoadBalancer
+  port: 80
+  nodePorts:
+    http: ""
+    https: ""
+  externalTrafficPolicy: Cluster
+
+## Configure the ingress resource that allows you to access the
+ingress:
+  ## Set to true to enable ingress record generation
+  enabled: false
+
+  ## The list of hostnames to be covered with this ingress record.
+  hosts:
+    - name: mediawiki.local
+
+      ## Set this to true in order to enable TLS on the ingress record
+      tls: false
+
+      ## Set this to true in order to add the corresponding annotations for cert-manager
+      certManager: false
+
+      ## If TLS is set to true, you must declare what secret will store the key/certificate for TLS
+      tlsSecret: mediawiki.local-tls
+
+      ## Ingress annotations done as key:value pairs
+      annotations:
+  secrets:
+persistence:
+  enabled: true
+  # storageClass: "-"
+  ## A manually managed Persistent Volume and Claim
+  accessMode: ReadWriteOnce
+  size: 8Gi
+## Configure resource requests and limits
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 300m
+podSecurityContext:
+  enabled: true
+  fsGroup: 1001
+
+## Configure Container Security Context (only main container)
+containerSecurityContext:
+  enabled: true
+  runAsUser: 1001
+
+## Configure extra options for liveness and readiness probes\
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 120
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+podAnnotations: {}
+affinity: {}
