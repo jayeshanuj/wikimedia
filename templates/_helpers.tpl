@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "mediawiki.name" -}}
+{{- define "wikimedia.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -10,7 +10,7 @@ Expand the name of the chart.
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
-{{- define "mediawiki.fullname" -}}
+{{- define "wikimedia.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -27,7 +27,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 Get the user defined LoadBalancerIP for this release.
 Note, returns 127.0.0.1 if using ClusterIP.
 */}}
-{{- define "mediawiki.serviceIP" -}}
+{{- define "wikimedia.serviceIP" -}}
 {{- if eq .Values.service.type "ClusterIP" -}}
 127.0.0.1
 {{- else -}}
@@ -39,22 +39,22 @@ Note, returns 127.0.0.1 if using ClusterIP.
 Gets the host to be used for this application.
 If not using ClusterIP, or if a host or LoadBalancerIP is not defined, the value will be empty.
 */}}
-{{- define "mediawiki.host" -}}
+{{- define "wikimedia.host" -}}
 {{- $host := index .Values (printf "%sHost" .Chart.Name) | default "" -}}
-{{- default (include "mediawiki.serviceIP" .) $host -}}
+{{- default (include "wikimedia.serviceIP" .) $host -}}
 {{- end -}}
 
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "mediawiki.chart" -}}
+{{- define "wikimedia.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Return the proper Mediawiki image name
 */}}
-{{- define "mediawiki.image" -}}
+{{- define "wikimedia.image" -}}
 {{- $registryName := .Values.image.registry -}}
 {{- $repositoryName := .Values.image.repository -}}
 {{- $tag := .Values.image.tag | toString -}}
@@ -78,14 +78,14 @@ Also, we can't use a single if because lazy evaluation is not an option
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
-{{- define "mediawiki.mariadb.fullname" -}}
+{{- define "wikimedia.mariadb.fullname" -}}
 {{- printf "%s-%s" .Release.Name "mariadb" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Return the proper image name (for the metrics image)
 */}}
-{{- define "mediawiki.metrics.image" -}}
+{{- define "wikimedia.metrics.image" -}}
 {{- $registryName := .Values.metrics.image.registry -}}
 {{- $repositoryName := .Values.metrics.image.repository -}}
 {{- $tag := .Values.metrics.image.tag | toString -}}
@@ -108,7 +108,7 @@ Also, we can't use a single if because lazy evaluation is not an option
 {{/*
 Return the proper Docker Image Registry Secret Names
 */}}
-{{- define "mediawiki.imagePullSecrets" -}}
+{{- define "wikimedia.imagePullSecrets" -}}
 {{/*
 Helm 2.11 supports the assignment of a value to a variable defined in a different scope,
 but Helm 2.9 and 2.10 does not support it, so we need to implement this if-else logic.
@@ -143,7 +143,7 @@ imagePullSecrets:
 {{/*
 Return  the proper Storage Class
 */}}
-{{- define "mediawiki.storageClass" -}}
+{{- define "wikimedia.storageClass" -}}
 {{/*
 Helm 2.11 supports the assignment of a value to a variable defined in a different scope,
 but Helm 2.9 and 2.10 does not support it, so we need to implement this if-else logic.
@@ -178,7 +178,7 @@ but Helm 2.9 and 2.10 does not support it, so we need to implement this if-else 
 {{/*
 Return the appropriate apiVersion for deployment.
 */}}
-{{- define "mediawiki.deployment.apiVersion" -}}
+{{- define "wikimedia.deployment.apiVersion" -}}
 {{- if semverCompare "<1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 {{- print "extensions/v1beta1" -}}
 {{- else -}}
