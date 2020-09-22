@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "mediawiki.fullname" . }}
+  name: {{ template "wikimedia.fullname" . }}
   labels:
-    app: {{ template "mediawiki.name" . }}
+    app: {{ template "wikimedia.name" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: {{ .Release.Name | quote }}
     heritage: {{ .Release.Service | quote }}
@@ -31,4 +31,4 @@ spec:
       {{- end }}
   {{- end }}
   selector:
-    app: {{ template "mediawiki.name" . }}
+    app: {{ template "wikimedia.name" . }}
