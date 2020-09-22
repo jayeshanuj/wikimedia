@@ -124,3 +124,15 @@ readinessProbe:
   successThreshold: 1
 podAnnotations: {}
 affinity: {}
+
+## Prometheus Exporter / Metrics
+metrics:
+  enabled: false
+  image:
+    registry: docker.io
+    repository: bitnami/apache-exporter
+    tag: 0.7.0-debian-10-r29
+    pullPolicy: IfNotPresent
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9117"
